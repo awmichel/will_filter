@@ -750,9 +750,9 @@ module WillFilter
     end
     
     def association_class(inner_join)
-      model_class.new.association(association_name(inner_join)).build.class
-    end  
-      
+      model_class.reflect_on_association(association_name(inner_join).to_sym).klass
+    end
+
     # deprecated for Rails 3.0 and up
     def joins
       return nil if inner_joins.empty?
