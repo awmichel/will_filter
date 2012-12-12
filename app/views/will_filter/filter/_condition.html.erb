@@ -1,13 +1,13 @@
 <% if wf_filter.errors[index] %>
   <tr>
-    <td colspan="2"></td> 
+    <td colspan="2"></td>
     <td>
-      <div class="error">
-        <%= wf_filter.errors[index] %>  
+      <div class="label label-important">
+        <%= wf_filter.errors[index] %>
       </div>
     </td>
     <td></td>
-  </tr> 
+  </tr>
 <% end %>
 
 <tr>
@@ -15,14 +15,13 @@
     <%= select_tag "wf_c#{index}", options_for_select(wf_filter.condition_options, condition.key.to_s), {:class=>"wf_input full_width", :onChange=>"wfFilter.updateConditionAt('#{index}')"} %>
   </td>
   <td class="operator">
-    <%= select_tag "wf_o#{index}", options_for_select(wf_filter.operator_options_for(condition.key), condition.operator.to_s), {:class=>"wf_input full_width", :onChange=>"wfFilter.updateConditionAt('#{index}')"} %>
+    <%= select_tag "wf_o#{index}", options_for_select(wf_filter.operator_options_for(condition.key), condition.operator.to_s), {:class=>"input-medium", :onChange=>"wfFilter.updateConditionAt('#{index}')"} %>
   </td>
   <td class="values">
 	  <%= render :partial => "/will_filter/filter/containers/#{condition.container.template_name}", :locals => {:container => condition.container, :index => index} %>
   </td>
   <td class="actions">
-    <%=link_to_function("<span>-</span>".html_safe, "wfFilter.removeConditionAt('#{index}')", :class => "wf_grey_button wf_pcb") %>
-    <%=link_to_function("<span>+</span>".html_safe, "wfFilter.addConditionAfter('#{index}')", :class => "wf_grey_button wf_pcb") %>
+    <%=link_to_function("<i class='icon-minus'></i>".html_safe, "wfFilter.removeConditionAt('#{index}')", :class => "btn btn-small") %>
   </td>
 </tr>
-      
+

@@ -1,38 +1,51 @@
-<div style="margin:0;padding:0;display:inline">
-  <%= hidden_field_tag(:wf_id, wf_filter.id) %>
-  <%= hidden_field_tag(:wf_type, wf_filter.class.name) %>
-  <%= hidden_field_tag(:wf_dirty, "false") %>
-  <%= hidden_field_tag(:wf_submitted, "false") %>
-  <%= hidden_field_tag(:wf_name, wf_filter.name) %>
+<%= hidden_field_tag(:wf_id, wf_filter.id) %>
+<%= hidden_field_tag(:wf_type, wf_filter.class.name) %>
+<%= hidden_field_tag(:wf_dirty, "false") %>
+<%= hidden_field_tag(:wf_submitted, "false") %>
+<%= hidden_field_tag(:wf_name, wf_filter.name) %>
 
-  <% unless WillFilter::Config.require_filter_extensions? %>
-    <%= hidden_field_tag(:wf_model, wf_filter.model_class_name) %>
-  <% end %>
-    
-  <%= hidden_field_tag(:wf_export_format, "") %>
-  <%= hidden_field_tag(:wf_export_fields, "") %>
-</div>
+<% unless WillFilter::Config.require_filter_extensions? %>
+  <%= hidden_field_tag(:wf_model, wf_filter.model_class_name) %>
+<% end %>
 
-<div class="header">
-  <% if wf_filter.show_export_options? %>
-    <div class="end" style="padding-left:3px;">
-      <%=link_to_function("<span>Export Data...</span>".html_safe, "wfExporter.show(this)", :class => "wf_grey_button wf_pcb") %>
-    </div>  
-  <% end %>
-  
-  <% if wf_filter.show_save_options? %>
-    <div class="end">
-      <%=link_to_function("<span>Save As New...</span>".html_safe, "wfFilter.saveFilter()", :class => "wf_grey_button wf_pcb") %>
-      <% if wf_filter.id %>
-        <%=link_to_function("<span>Update</span>".html_safe, "wfFilter.updateFilter()", :class => "wf_grey_button wf_pcb") %>
-        <%=link_to_function("<span>Delete</span>".html_safe, "wfFilter.deleteFilter()", :class => "wf_grey_button wf_pcb") %>
-      <% end %>
-    </div>
-  <% end %>
+<%= hidden_field_tag(:wf_export_format, "") %>
+<%= hidden_field_tag(:wf_export_fields, "") %>
 
-  <div>
+<div class="row-fluid">
+  <div class="span6">
     <% unless wf_filter.saved_filters.empty? %>
-       <%= select_tag(:wf_key, options_for_select(wf_filter.saved_filters, wf_filter.key), {:onChange=>"wfFilter.loadSavedFilter()"}) %>
+       <%= select_tag(:wf_key, grouped_options_for_select(wf_filter.saved_filters, wf_filter.key), {:onChange=>"wfFilter.loadSavedFilter()"}) %>
+    <% end %>
+  </div>
+
+  <div class="span6 text-right btn-toolbar">
+    <% if wf_filter.show_save_options? %>
+      <div class="btn-group">
+        <%=link_to_function("<i class='icon-copy'></i> Save As New".html_safe, "wfFilter.saveFilter()", :class => "btn btn-small") %>
+      </div>
+      <div class="btn-group">
+        <% if wf_filter.id %>
+          <%=link_to_function("<i class='icon-save'></i> Update".html_safe, "wfFilter.updateFilter()", :class => "btn btn-success btn-small") %>
+          <%=link_to_function("<i class='icon-trash'></i> Delete".html_safe, "wfFilter.deleteFilter()", :class => "btn btn-danger btn-small") %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if wf_filter.show_export_options? %>
+      <div class="btn-group export-to">
+        <a class="btn btn-info btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+          <i class="icon-inbox"></i>
+          Export To
+          <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+          <%- wf_filter.export_formats.each do |name,value| %>
+            <li>
+              <%= link_to_function name, "wfExporter.exportFilterPreset('#{value}')" %>
+            </li>
+          <%- end %>
+        </ul>
+      </div>
     <% end %>
   </div>
 </div>

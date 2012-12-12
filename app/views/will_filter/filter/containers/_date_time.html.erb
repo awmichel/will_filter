@@ -1,10 +1,9 @@
-<table class='values' cellspacing='0px' cellpadding='0px'>
-	<tr>
-    <td width='99%'>
-			<%=text_field_tag("wf_v#{index}_0", container.sanitized_value, :style => 'width:99%', :onChange => 'wfFilter.fieldChanged(this)')%>	
-    </td>
-		<td width='1%'>
-			<%=link_to_function(image_tag("will_filter/clock.png", :title => "Select date and time", :class => "wf_calendar_trigger"), "wfCalendar.selectDateTime('wf_v#{index}_0', this)")%>	
-    </td>
-	</tr>
-</table>
+<script>
+  $('input.date', 'div.date-value').datepicker(window.datepickerOptions);
+</script>
+<div class="date-value">
+  <div class="input-prepend">
+    <span class="add-on"><i class="icon-calendar"></i></span>
+    <%=text_field_tag("wf_v#{index}_0", container.sanitized_value, :onChange => 'wfFilter.fieldChanged(this)', :class => "date")%>
+  </div>
+</div>
