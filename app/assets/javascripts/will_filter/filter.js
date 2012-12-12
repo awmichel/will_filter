@@ -8,10 +8,10 @@
   distribute, sublicense, and/or sell copies of the Software, and to
   permit persons to whom the Software is furnished to do so, subject to
   the following conditions:
- 
+
   The above copyright notice and this permission notice shall be
   included in all copies or substantial portions of the Software.
- 
+
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -25,9 +25,10 @@
 **** Generic Helper Functions
 ****************************************************************************/
 
+
 var Wf = Wf || {
   element:function(element_id) {
-		if (typeof element_id == 'string') return document.getElementById(element_id);
+    if (typeof element_id == 'string') return document.getElementById(element_id);
     return element_id;
   },
   value:function(element_id) {
@@ -62,7 +63,7 @@ var Wf = Wf || {
       theElement = theElement.offsetParent;
     }
     window.scrollTo(selectedPosX,selectedPosY);
-  }	
+  }
 };
 
 /****************************************************************************
@@ -71,10 +72,10 @@ var Wf = Wf || {
 ****************************************************************************/
 Wf.Effects = {
   blindUp: function(element_id) {
-    Wf.hide(element_id);    
+    Wf.hide(element_id);
   },
   blindDown: function(element_id) {
-    Wf.show(element_id);    
+    Wf.show(element_id);
   },
   appear: function(element_id) {
     Wf.show(element_id);
@@ -89,49 +90,48 @@ Wf.Effects = {
 ****************************************************************************/
 
 Wf.Filter = function(options){
-	var self = this;
+  var self = this;
   this.original_form_action = null;
 }
 
 Wf.Filter.prototype = {
   showSpinner: function() {
-    Wf.show("wf_loader");
+    $('div.wf_container').block({ message: 'Loading...' });
   },
   hideSpinner: function() {
-    Wf.hide("wf_loader");
+    $('div.wf_container').unblock();
   },
   toggleDebugger: function() {
-		if (Wf.visible("wf_debugger")) {
-			new Wf.Effects.blindUp("wf_debugger");
-		} else {	
-		  new Wf.Effects.blindDown("wf_debugger");
-		}
-	},
-	markDirty: function() {
-	  if (Wf.element("wf_key") && Wf.value("wf_id") == "") {
-	    Wf.element("wf_key").value = "";
-	  }
-	},
-	fieldChanged: function(fld) {
-	  Wf.element(fld).style.border = "1px solid red";
-	  this.markDirty();
-	},
-	saveFilter: function() {
+    if (Wf.visible("wf_debugger")) {
+      new Wf.Effects.blindUp("wf_debugger");
+    } else {
+      new Wf.Effects.blindDown("wf_debugger");
+    }
+  },
+  markDirty: function() {
+    if (Wf.element("wf_key") && Wf.value("wf_id") == "") {
+      Wf.element("wf_key").value = "";
+    }
+  },
+  fieldChanged: function(fld) {
+    this.markDirty();
+  },
+  saveFilter: function() {
     var filter_name = prompt("Please provide a name for the new filter:", "");
     if (filter_name == null) return;
-    Wf.element("wf_name").value = filter_name;   
+    Wf.element("wf_name").value = filter_name;
     this.showSpinner();
     this.updateFilterConditions('save_filter', Wf.Utils.serializeForm('wf_form'));
-	},
+  },
   updateFilter: function() {
     var filter_name = prompt("Please provide a name for this filter:", Wf.value("wf_name"));
     if (filter_name == null) return;
-    Wf.element("wf_name").value = filter_name;   
-		this.showSpinner();
+    Wf.element("wf_name").value = filter_name;
+    this.showSpinner();
     this.updateFilterConditions('update_filter', Wf.Utils.serializeForm('wf_form'));
   },
   deleteFilter: function() {
-		if (!confirm("Are you sure you want to delete this filter?")) return;
+    if (!confirm("Are you sure you want to delete this filter?")) return;
     this.showSpinner();
     this.updateFilterConditions('delete_filter', Wf.Utils.serializeForm('wf_form'));
   },
@@ -142,180 +142,59 @@ Wf.Filter.prototype = {
     data_hash["at_index"] = index;
     this.updateFilterConditions('update_condition', data_hash);
   },
-	removeConditionAt: function(index) {
+  removeConditionAt: function(index) {
     this.showSpinner();
     this.markDirty();
     var data_hash = Wf.Utils.serializeForm('wf_form');
     data_hash["at_index"] = index;
     this.updateFilterConditions('remove_condition', data_hash);
-	},
+  },
   removeAllConditions: function() {
     this.showSpinner();
     this.markDirty();
     this.updateFilterConditions('remove_all_conditions', Wf.Utils.serializeForm('wf_form'));
   },
-	addCondition: function() {
+  addCondition: function() {
     this.addConditionAfter(-1);
-	},
+  },
   addConditionAfter: function(index) {
     this.showSpinner();
     this.markDirty();
     var data_hash = Wf.Utils.serializeForm('wf_form');
     data_hash["after_index"] = index;
-		this.updateFilterConditions('add_condition', data_hash);
+    this.updateFilterConditions('add_condition', data_hash);
   },
-	updateFilterConditions: function(action, data_hash) {
-    Wf.Utils.update('wf_filter_conditions', '/will_filter/filter/' + action, {
+  updateFilterConditions: function(action, data_hash) {
+    Wf.Utils.update('wf_filter_conditions', '/wf/filter/' + action, {
       parameters: data_hash,
       evalScripts: true,
       onComplete: function(transport) {
         wfFilter.hideSpinner();
-      } 
+      }
     });
-	},	
-	loadSavedFilter: function() {
-	  if (Wf.value("wf_key") == "-1" || Wf.value("wf_key") == "-2")
-	    return;
-	
-	  this.showSpinner();
-	  var data_hash = Wf.Utils.serializeForm('wf_form');
-	
-    Wf.Utils.update('wf_filter_conditions', '/will_filter/filter/load_filter', {
+  },
+  loadSavedFilter: function() {
+    if (Wf.value("wf_key") == "-1" || Wf.value("wf_key") == "-2")
+      return;
+
+    this.showSpinner();
+    var data_hash = Wf.Utils.serializeForm('wf_form');
+
+    Wf.Utils.update('wf_filter_conditions', '/wf/filter/load_filter', {
       parameters: data_hash,
       evalScripts: true,
       onComplete: function(transport) {
         wfFilter.submit();
-      } 
+      }
     });
-	},
-	submit: function() {
-    if (this.original_form_action != "") 
+  },
+  submit: function() {
+    if (this.original_form_action != "")
         Wf.element('wf_form').action = this.original_form_action;
-		
+
     Wf.element('wf_submitted').value = 'true';
     Wf.submit('wf_form');
-	}
-};
-
-/****************************************************************************
-**** Filter Calendar
-****************************************************************************/
-
-Wf.Calendar = function(options) {
-  this.options = options || {};
-  this.trigger = null;
-  this.last_selected_cell = null;
-  this.selected_field_id = null;
-
-  this.container                = document.createElement('div');
-  this.container.className      = 'wf_calendar';
-  this.container.id             = 'wf_calendar';
-  this.container.style.display  = "none";
-
-  document.body.appendChild(this.container);
-}
-
-Wf.Calendar.prototype = {
-  show: function(fld_id, trigger, show_time) {
-    if (this.selected_field_id == fld_id) {
-      this.hide();
-      return;
-    }
-
-    this.trigger = trigger;
-		
-    var form_hash = {};
-		form_hash["wf_calendar_selected_date"] = Wf.value(fld_id);
-    form_hash["wf_calendar_show_time"] = show_time;
-		
-    this.selected_field_id = fld_id;
-    Wf.Utils.update('wf_calendar', '/will_filter/calendar', {
-      parameters: form_hash,
-      onComplete: function(transport) {
-          var trigger_position = Wf.Utils.cumulativeOffset(wfCalendar.trigger);
-          var calendar_container = Wf.element("wf_calendar");
-          calendar_container.style.left = (trigger_position[0] - 273) + "px";
-          calendar_container.style.top = trigger_position[1] - 38 + "px";
-          calendar_container.style.width = "260px";
-          Wf.Effects.appear("wf_calendar");
-      } 
-    });
-  },
-  selectDate: function(fld_id, trigger){
-    this.show(fld_id, trigger, false);
-  },
-  selectDateTime: function(fld_id, trigger){
-    this.show(fld_id, trigger, true);
-  },
-	changeMode: function(mode) {
-    var form_hash = Wf.Utils.serializeForm('wf_calendar_form');
-    form_hash["wf_calendar_mode"] = mode;
-		
-    if (mode == 'annual')
-      form_hash["wf_calendar_start_date"] = Wf.value("wf_calendar_year") + "-01-01";
-		
-    Wf.Utils.update('wf_calendar', '/will_filter/calendar', {
-      parameters: form_hash,
-      onComplete: function(transport) {
-          var trigger_position = Wf.Utils.cumulativeOffset(wfCalendar.trigger);
-          var width = (mode=='annual' ? 760 : 400);
-          var calendar_container = Wf.element("wf_calendar");
-          calendar_container.style.left = (trigger_position[0] - width - 13) + "px";
-          calendar_container.style.top = trigger_position[1] - 38 + "px";
-          calendar_container.style.width = width + "px";
-      } 
-    });
-	},
-	goToStartDate: function(start_date) {
-    var form_hash = Wf.Utils.serializeForm('wf_calendar_form');
-		if (start_date == '')
-      form_hash["wf_calendar_start_date"] = Wf.value("wf_calendar_year") + "-" + Wf.value("wf_calendar_month") + "-01";
-		else
-			form_hash["wf_calendar_start_date"] = start_date;
-		
-	  Wf.Utils.update('wf_calendar', '/will_filter/calendar', {
-	    parameters: form_hash
-	  });
-	},
-	setSelectedFieldValue: function(value) {
-	  if (this.selected_field_id==null || Wf.element(this.selected_field_id)==null)
-	    return;
-	  Wf.element(this.selected_field_id).value = value;
-		wfFilter.fieldChanged(this.selected_field_id);
-	  this.selected_field_id = null;
-	},
-	selectDateValue: function(elem_id, date) {
-		if (this.last_selected_cell)
-		  Wf.Utils.removeClassName(Wf.element(this.last_selected_cell), "selected");
-			
-	  Wf.Utils.addClassName(Wf.element(elem_id), 'selected'); 
-		this.last_selected_cell = elem_id;
-		
-	  Wf.element("wf_calendar_selected_date").value = date;
-	},
-	setDate: function() {
-	  this.setSelectedFieldValue(Wf.value("wf_calendar_selected_date"));
-    this.hide();
-	},
-	prepandZero: function(val) {
-	  if (parseInt(val) >= 10) 
-	    return val;
-	    
-	  return ("0" + val);
-	},
-	setDateTime: function() {
-	  var val = Wf.value("wf_calendar_selected_date");
-	  val += " " + this.prepandZero(Wf.value("wf_calendar_hour"));
-	  val += ":" + this.prepandZero(Wf.value("wf_calendar_minute"));
-	  val += ":" + this.prepandZero(Wf.value("wf_calendar_second"));
-	  
-	  this.setSelectedFieldValue(val);
-	  this.hide();
-  },
-	hide: function() {
-		this.selected_field_id = null;
-    Wf.Effects.fade("wf_calendar");
-	}
+  }
 };
 
 /****************************************************************************
@@ -324,7 +203,7 @@ Wf.Calendar.prototype = {
 
 Wf.Exporter = function(options) {
   this.options = options || {};
-	
+
   this.container                = document.createElement('div');
   this.container.className      = 'wf_exporter';
   this.container.id             = 'wf_exporter';
@@ -334,58 +213,58 @@ Wf.Exporter = function(options) {
 }
 
 Wf.Exporter.prototype = {
-	show: function (trigger) {
-	  Wf.Utils.update('wf_exporter', '/will_filter/exporter', {
-	    parameters: Wf.Utils.serializeForm('wf_form'),
-	    onComplete: function(transport) {
+  show: function (trigger) {
+    Wf.Utils.update('wf_exporter', '/wf/exporter', {
+      parameters: Wf.Utils.serializeForm('wf_form'),
+      onComplete: function(transport) {
           var trigger_position = Wf.Utils.cumulativeOffset(trigger);
           var exporter_container = Wf.element("wf_exporter");
           exporter_container.style.left = (trigger_position[0] - 240) + "px";
           exporter_container.style.top = (trigger_position[1] - 32) + "px";
-				  Wf.Effects.appear("wf_exporter");
-	    } 
-	  });
+          Wf.Effects.appear("wf_exporter");
+      }
+    });
   },
   hide: function() {
     Wf.Effects.fade("wf_exporter");
   },
-	selectAllFields: function (fld) {
-	  var i = 0;
-	  var chkFld = Wf.element("wf_fld_chk_" + i);
-	  while (chkFld != null) {
-	    chkFld.checked = fld.checked;
-	    i++;
-	    chkFld = Wf.element("wf_fld_chk_" + i);
-	  }   
-	  this.updateExportFields();
-	},
-	selectField: function (fld) {
-	  if (!fld.checked) {
-	    Wf.element("wf_fld_all").checked = false;
-	  }
-	  this.updateExportFields();
-	},
-	updateExportFields: function () {
-	  var i = 0;
-	  var chkFld = Wf.element("wf_fld_chk_" + i);
-	  var fields = "";
-	  while (chkFld != null) {
-	    if (chkFld.checked) {
-	      if (fields != "") fields += ",";
-	      fields += Wf.value("wf_fld_name_" + i);
-	    }
-	    i++;
-	    chkFld = Wf.element("wf_fld_chk_" + i);
-	  }   
-	
-	  Wf.element("wf_export_fields").value = fields;
-	}, 
-  exportFilter: function() {
-		if (wfFilter.original_form_action == "")
-      wfFilter.original_form_action = Wf.element('wf_form').action;
-			
+  selectAllFields: function (fld) {
+    var i = 0;
+    var chkFld = Wf.element("wf_fld_chk_" + i);
+    while (chkFld != null) {
+      chkFld.checked = fld.checked;
+      i++;
+      chkFld = Wf.element("wf_fld_chk_" + i);
+    }
     this.updateExportFields();
-		
+  },
+  selectField: function (fld) {
+    if (!fld.checked) {
+      Wf.element("wf_fld_all").checked = false;
+    }
+    this.updateExportFields();
+  },
+  updateExportFields: function () {
+    var i = 0;
+    var chkFld = Wf.element("wf_fld_chk_" + i);
+    var fields = "";
+    while (chkFld != null) {
+      if (chkFld.checked) {
+        if (fields != "") fields += ",";
+        fields += Wf.value("wf_fld_name_" + i);
+      }
+      i++;
+      chkFld = Wf.element("wf_fld_chk_" + i);
+    }
+
+    Wf.element("wf_export_fields").value = fields;
+  },
+  exportFilter: function() {
+    if (wfFilter.original_form_action == "")
+      wfFilter.original_form_action = Wf.element('wf_form').action;
+
+    this.updateExportFields();
+
     if (Wf.value("wf_export_fields") == "") {
       alert("Please select st least one field to export");
       return;
@@ -396,8 +275,18 @@ Wf.Exporter.prototype = {
       return;
     }
 
-    Wf.element('wf_export_format').value = Wf.value('wf_export_format_selector'); 
-    Wf.element('wf_form').action = '/will_filter/exporter/export';
+    Wf.element('wf_export_format').value = Wf.value('wf_export_format_selector');
+    Wf.element('wf_form').action = '/wf/exporter/export';
+    Wf.submit('wf_form');
+  },
+  exportFilterPreset: function(preset) {
+    if (wfFilter.original_form_action == "")
+      wfFilter.original_form_action = Wf.element('wf_form').action;
+
+    this.updateExportFields();
+
+    Wf.element('wf_export_format').value = preset;
+    Wf.element('wf_form').action = '/wf/exporter/export';
     Wf.submit('wf_form');
   }
 };
@@ -423,27 +312,27 @@ Wf.Utils = {
     }
   },
 
-  toQueryParams: function (obj) { 
+  toQueryParams: function (obj) {
     if (typeof obj == 'undefined' || obj == null) return "";
-    if (typeof obj == 'string') return obj;      
-    
+    if (typeof obj == 'string') return obj;
+
     var qs = [];
     for(p in obj) {
         qs.push(p + "=" + encodeURIComponent(obj[p]))
     }
     return qs.join("&")
   },
-  
-  serializeForm: function(form) { 
-    var els = Wf.element(form).elements; 
-    var form_obj = {} 
+
+  serializeForm: function(form) {
+    var els = Wf.element(form).elements;
+    var form_obj = {}
     for(i=0; i < els.length; i++) {
       if (els[i].type == 'checkbox' && !els[i].checked) continue;
       if (els[i].type == 'radio' && !els[i].checked) continue;
       form_obj[els[i].name] = els[i].value;
-    } 
-    return form_obj; 
-  }, 
+    }
+    return form_obj;
+  },
 
   getRequest: function() {
     var factories = [
@@ -469,7 +358,7 @@ Wf.Utils = {
       url = url + (url.indexOf('?') == -1 ? '?' : '&') + options.parameters;
     }
     var request = this.getRequest();
-    
+
     request.onreadystatechange = function() {
       if(request.readyState == 4) {
         if (request.status == 200) {
@@ -482,7 +371,7 @@ Wf.Utils = {
         }
       }
     }
-    
+
     request.open(options.method, url, true);
     request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     request.setRequestHeader('Accept', 'text/javascript, text/html, application/xml, text/xml, */*');
@@ -495,7 +384,7 @@ Wf.Utils = {
     };
     Wf.Utils.ajax(url, options);
   },
-  
+
   evalScripts: function(html){
     var script_re = '<script[^>]*>([\\S\\s]*?)<\/script>';
     var matchAll = new RegExp(script_re, 'img');
@@ -517,7 +406,7 @@ Wf.Utils = {
   addClassName: function(el, cls) {
     if (!Wf.Utils.hasClassName(el,cls)) el.className += " " + cls;
   },
-  
+
   removeClassName: function(el,cls) {
     if (Wf.Utils.hasClassName(el,cls)) {
       var reg = new RegExp('(\\s|^)'+cls+'(\\s|$)');
@@ -546,7 +435,7 @@ Wf.Utils = {
     } while (element);
     return [valueL, valueT];
   }
-	
+
 }
 
 /****************************************************************************
@@ -554,15 +443,14 @@ Wf.Utils = {
 ****************************************************************************/
 
 var wfFilter = null;
-var wfCalendar = null;
 var wfExporter = null;
 
-function initializeWillFilter() { 
-  var setup = function() { 
-    wfFilter = new Wf.Filter(); 
-    wfCalendar = new Wf.Calendar(); 
-    wfExporter = new Wf.Exporter(); 
-  } 
-	
+function initializeWillFilter() {
+  var setup = function() {
+    wfFilter = new Wf.Filter();
+    wfExporter = new Wf.Exporter();
+  }
+
   Wf.Utils.addEvent(window,'load',setup);
 }
+;
