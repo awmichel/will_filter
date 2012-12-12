@@ -4,7 +4,6 @@
 <div class="date-range-values">
   <div class="input-prepend">
     <span class="add-on"><i class="icon-calendar"></i></span>
-    <%= binding.remote_pry %>
     <%=text_field_tag("wf_v#{index}_0", container.sanitized_value(0), :onChange => 'wfFilter.fieldChanged(this)', :class => "date")%>
   </div>
   <span> to </span>
